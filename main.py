@@ -1,5 +1,6 @@
 import sys
 from io import BytesIO
+from geocode import *
 # Этот класс поможет нам сделать картинку из потока байт
 
 import requests
@@ -10,7 +11,6 @@ from PIL import Image
 # Тогда запрос к геокодеру формируется следующим образом:
 toponym_to_find = " ".join(sys.argv[1:-1])
 spn = sys.argv[-1]
-print(spn)
 
 geocoder_api_server = f"http://geocode-maps.yandex.ru/1.x/"
 
@@ -45,6 +45,16 @@ map_params = {
 }
 
 map_api_server = f"http://static-maps.yandex.ru/1.x/?spn={spn},{spn}&pt={map_params['ll']}"
+# ... и выполняем запрос
+response = requests.get(map_api_server, params=map_params)
+
+Image.open(BytesIO(
+    response.content)).show()
+
+
+ll, span = get_ll_span(toponym_to_find)
+
+map_api_server = f"http://static-maps.yandex.ru/1.x/?ll={ll}&spn={span}"
 # ... и выполняем запрос
 response = requests.get(map_api_server, params=map_params)
 
